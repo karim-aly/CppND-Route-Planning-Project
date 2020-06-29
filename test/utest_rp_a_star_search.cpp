@@ -90,6 +90,39 @@ TEST_F(RoutePlannerTest, TestAddNeighbors) {
     }
 }
 
+// Test the NextNode method.
+// For this test to run, route_planner.open_list must be made public
+TEST_F(RoutePlannerTest, TestNextNode) {
+    // Correct h and g values for the neighbors of start_node.
+    std::vector<float> start_neighbor_g_vals{0.10671431, 0.082997195, 0.051776856, 0.055291083};
+    std::vector<float> start_neighbor_h_vals{1.1828455, 1.0998145, 1.0858033, 1.1831238};
+
+    std::vector<RouteModel::Node*> *open = &route_planner.open_list;
+
+    route_planner.AddNeighbors(start_node);
+    EXPECT_EQ(open->size(), 4);
+
+    RouteModel::Node* next_node = route_planner.NextNode();
+    EXPECT_EQ(open->size(), 3);
+    EXPECT_FLOAT_EQ(next_node->g_value, start_neighbor_g_vals[2]);
+    EXPECT_FLOAT_EQ(next_node->h_value, start_neighbor_h_vals[2]);
+
+    next_node = route_planner.NextNode();
+    EXPECT_EQ(open->size(), 2);
+    EXPECT_FLOAT_EQ(next_node->g_value, start_neighbor_g_vals[1]);
+    EXPECT_FLOAT_EQ(next_node->h_value, start_neighbor_h_vals[1]);
+
+    next_node = route_planner.NextNode();
+    EXPECT_EQ(open->size(), 1);
+    EXPECT_FLOAT_EQ(next_node->g_value, start_neighbor_g_vals[3]);
+    EXPECT_FLOAT_EQ(next_node->h_value, start_neighbor_h_vals[3]);
+
+    next_node = route_planner.NextNode();
+    EXPECT_EQ(open->size(), 0);
+    EXPECT_FLOAT_EQ(next_node->g_value, start_neighbor_g_vals[0]);
+    EXPECT_FLOAT_EQ(next_node->h_value, start_neighbor_h_vals[0]);
+}
+
 
 // Test the ConstructFinalPath method.
 TEST_F(RoutePlannerTest, TestConstructFinalPath) {
